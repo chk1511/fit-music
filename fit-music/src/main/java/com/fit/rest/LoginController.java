@@ -2,7 +2,10 @@ package com.fit.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,35 +33,35 @@ public class LoginController {
 	public ModelAndView login() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/login");
+		mv.setViewName("/jsp/login");
 		
 		return mv;
 	}
 	
-	@RequestMapping(value="/join/view", method=RequestMethod.GET)
+	@RequestMapping(value="/join", method=RequestMethod.GET)
 	public ModelAndView joinView() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/join");
+		mv.setViewName("/jsp/join");
 		
 		return mv;
 	}
 	
-	@RequestMapping(value="/join", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	public ModelAndView join(@RequestParam String inputId, @RequestParam String inputName, @RequestParam String inputPass) {
+	@RequestMapping(value="/join_action", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+	public Boolean joinAction(@RequestBody User input) {
 		
-		User user = new User();
-		user.setId(inputId);
-		user.setName(inputName);
-		user.setPassword(inputPass);
+		mongoTemplete.insert(input);
 		
-		mongoTemplete.insert(user);
+		return true;
+	}
+	
+	@RequestMapping(value="/user_find", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+	public User findUser(@RequestParam String id) {
 		
-		ModelAndView mv = new ModelAndView();
-		mv.addObject("user", user);
-		mv.setViewName("redirect:/login");
+		Query query = new Query();
+		query.addCriteria(Criteria.where("id").is(id));
 		
-		return mv;
+		return mongoTemplete.findOne(query, User.class);
 	}
 
 	@RequestMapping(value="/login_action", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
