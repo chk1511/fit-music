@@ -1,5 +1,10 @@
 package com.fit.rest;
 
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,13 +23,31 @@ import com.fit.entity.User;
 public class LoginController {
 	
 	@Autowired
-	private MongoTemplate mongoTemplete;
+	MongoTemplate mongoTemplate;
+	
+	public LoginController() {
+		
+	}
+	
+	public LoginController(MongoTemplate mongo) {
+		// TODO Auto-generated constructor stub
+		mongoTemplate = mongo;
+	}
 	
 	@RequestMapping("/")
 	public ModelAndView index() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("redirect:login");
+		mv.setViewName("redirect:main");
+		
+		return mv;
+	}
+	
+	@RequestMapping("/main")
+	public ModelAndView main() {
+		
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("/jsp/front/main");
 		
 		return mv;
 	}
@@ -33,46 +56,73 @@ public class LoginController {
 	public ModelAndView login() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/jsp/login");
+		mv.setViewName("/jsp/front/login");
 		
 		return mv;
 	}
 	
-	@RequestMapping(value="/join", method=RequestMethod.GET)
-	public ModelAndView joinView() {
+	@RequestMapping("/join")
+	public ModelAndView join() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/jsp/join");
+		mv.setViewName("/jsp/front/join");
 		
 		return mv;
 	}
 	
-	@RequestMapping(value="/join_action", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	public Boolean joinAction(@RequestBody User input) {
+	@RequestMapping(value="/join_action", method=RequestMethod.POST)
+	public ModelAndView join_action(HttpServletRequest request) {
 		
-		mongoTemplete.insert(input);
-		
-		return true;
-	}
-	
-	@RequestMapping(value="/user_find", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	public User findUser(@RequestParam String id) {
-		
-		Query query = new Query();
-		query.addCriteria(Criteria.where("id").is(id));
-		
-		return mongoTemplete.findOne(query, User.class);
-	}
+		User user = new User();
+		user.setId(request.getParameter("inputId"));
+		user.setName(request.getParameter("inputName"));
+		user.setPassword(request.getParameter("inputPass"));
 
-	@RequestMapping(value="/login_action", method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	public ModelAndView loginAction(@RequestParam String inputId, @RequestParam String inputPass) {
-		
-		User user = mongoTemplete.findById(inputId, User.class);
+		mongoTemplate.insert(user);
 		
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("user", user);
-		mv.setViewName("/main");
+		mv.setViewName("redirect:main");
 		
 		return mv;
+	}
+	
+	@RequestMapping(value="/loin_action", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, Object> loin_action(HttpServletRequest request, @RequestParam String inputId, @RequestParam String inputPass) {
+		
+		HttpSession session =request.getSession();
+		Map<String, Object> map = null;
+		String error = null;
+		
+		User user = this.user_search("_id", inputId);
+		
+		if(user != null){
+			if(user.getPassword().equals(inputPass)){
+				error = "비밀번호가 일치하지 않습니다.";
+			}else{
+				// 로그인 성공
+			    session.setAttribute("user", user);
+				session.setAttribute("loginId", user.getId());
+				session.setAttribute("loginName", user.getName());
+				session.setAttribute("loginPhone", user.getPassword());
+				
+				map.put("user", user);
+			}
+		}else{
+			error = "아이디가 존재하지 않습니다.";
+		}
+		map.put("error", error);
+		
+		return map;
+	}
+	
+	public User user_search(String key, String value){
+		
+		Criteria criteria = new Criteria(key);
+		criteria.is(value);
+		
+		User user = mongoTemplate.findOne(new Query(criteria), User.class);
+		
+		return user;
 	}
 }
