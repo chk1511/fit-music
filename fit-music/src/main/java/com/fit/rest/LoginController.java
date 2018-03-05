@@ -1,5 +1,6 @@
 package com.fit.rest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,11 +11,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -57,7 +56,7 @@ public class LoginController {
 	public ModelAndView login() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/jsp/front/login");
+		mv.setViewName("/front/login");
 		
 		return mv;
 	}
@@ -66,7 +65,7 @@ public class LoginController {
 	public ModelAndView join() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/jsp/front/join");
+		mv.setViewName("/front/join");
 		
 		return mv;
 	}
@@ -88,17 +87,17 @@ public class LoginController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/loin_action", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, Object> loin_action(HttpServletRequest request, @RequestParam String inputId, @RequestParam String inputPass) {
+	@RequestMapping(value="/login_action", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, Object> loin_action(HttpServletRequest request, @RequestBody User input) {
 		
 		HttpSession session =request.getSession();
-		Map<String, Object> map = null;
+		Map<String, Object> map = new HashMap<String, Object>();
 		String error = null;
 		
-		User user = this.user_search("_id", inputId);
+		User user = this.user_search("_id", input.getId());
 		
 		if(user != null){
-			if(user.getPassword().equals(inputPass)){
+			if(user.getPassword().equals(input.getPassword())){
 				error = "비밀번호가 일치하지 않습니다.";
 			}else{
 				// 로그인 성공

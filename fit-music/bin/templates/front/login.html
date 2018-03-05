@@ -4,21 +4,22 @@
 	layout:decorator="layout/default">
 <head>
 	<meta charset="UTF-8"></meta>
-	<title>Main</title>
+	<title>Login</title>
 	<!-- 사용자 CSS 추가 -->
 	<!-- <th:block layout:fragment="css">
 	</th:block> -->
 	 
 	<!-- 사용자 스크립트 추가 -->
 	<th:block layout:fragment="script">
-		<!-- <script type="text/javascript" th:src="@{/js/login.js}"></script> -->
+		<script type="text/javascript" th:src="@{/js/login.js}"></script>
 	</th:block>
 </head>
 <body>
 	<div layout:fragment="content" >
-	  Hello World..!! dd
-	  <br />
-	  <th:block th:text="${serverTime}"></th:block>
+	  <input type="text" id="inputId" name="inputId"/>
+		<input type="password" id="inputPass" name="inputPass"/>
+		<button type="button" onclick="login_action()">Login</button>
+		<a href="join">Join</a>
 	</div>
 </body>
 </html>
