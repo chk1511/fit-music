@@ -16,8 +16,8 @@
 		<input type="text" id="inputId" name="inputId">
 		<input type="password" id="inputPass" name="inputPass">
 		<button type="button" onclick="login_action()">Login</button>
-		<a href="./join">Join</a>
+		<a href="join">Join</a>
 	</form>
 </body>
-	<script src="/js/login.js"></script>
+	<script type="text/javascript" src="/js/login.js"></script>
 </html>

@@ -10,7 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,7 +48,7 @@ public class LoginController {
 	public ModelAndView main() {
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("/jsp/front/main");
+		mv.setViewName("/front/main");
 		
 		return mv;
 	}
