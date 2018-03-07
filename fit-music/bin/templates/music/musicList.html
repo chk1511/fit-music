@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout/default">
+<head>
+	<meta charset="UTF-8"></meta>
+	<title>Music List</title>
+	<!-- 사용자 CSS 추가 -->
+	<!-- <th:block layout:fragment="css">
+	</th:block> -->
+	 
+	<!-- 사용자 스크립트 추가 -->
+	<th:block layout:fragment="script">
+		<script type="text/javascript" th:src="@{/js/music/musicList.js}"></script>
+	</th:block>
+</head>
+<body>
+	<div layout:fragment="content" >
+		<div th:if="${session.loginId == 'dev'}">
+			<a href="music_write">음악 등록</a>
+		</div>
+		
+	  <table>
+	  	<tr>
+	  		<td>추천지수</td>
+	  		<td>제목</td>
+	  		<td>가수</td>
+	  		<td>앨범</td>
+	  		<td>발매일</td>
+	  	</tr>
+	  	<tr th:each="l: ${list}">
+	  		<td>1</td>
+	  		<td th:text="${l.songTitle}"></td>
+	  		<td th:text="${l.singer}"></td>
+	  		<td th:text="${l.albumTitle}"></td>
+	  		<td th:text="${#calendars.format(l.releaseDate, 'yyyy-MM-dd')}"></td>
+	  	</tr>
+	  </table>
+	</div>
+</body>
+</html>

@@ -16,10 +16,9 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,17 +30,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.fit.config.MongoConfig;
 import com.fit.entity.User;
+import com.fit.rest.JoinController;
 import com.fit.rest.LoginController;
+import com.fit.rest.MainController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = { "com.fit.*" })
 @ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+//@ContextConfiguration(classes = { MongoConfig.class })
 public class FitMusicApplicationTests {
 
+	@InjectMocks
+	private MainController mainController;
+	private MockMvc mainMockMvc;
+	
+	@InjectMocks
 	private LoginController loginController;
-	private MockMvc mockMvc;
+	private MockMvc loginMockMvc;
+	
+	@InjectMocks
+	private JoinController joinController;
+	private MockMvc joinMockMvc;
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -49,17 +60,21 @@ public class FitMusicApplicationTests {
 	@Before
 	public void setup() {
 		loginController = new LoginController(mongoTemplate);
-		mockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
+		joinController = new JoinController(mongoTemplate);
+		
+		mainMockMvc = MockMvcBuilders.standaloneSetup(mainController).build();
+		loginMockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
+		joinMockMvc = MockMvcBuilders.standaloneSetup(joinController).build();
 		
 		mongoTemplate.findAllAndRemove(new Query(), User.class);
-		this.Join_action();
+		this.join_action();
 	}
 
 	@Test
 	public void index() {
 
 		try {
-			mockMvc.perform(get("/"))
+			mainMockMvc.perform(get("/"))
 			.andExpect(redirectedUrl("main"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -71,8 +86,8 @@ public class FitMusicApplicationTests {
 	public void main() {
 
 		try {
-			mockMvc.perform(get("/main"))
-			.andExpect(view().name("/jsp/front/main"));
+			mainMockMvc.perform(get("/main"))
+			.andExpect(view().name("/front/main"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -83,9 +98,9 @@ public class FitMusicApplicationTests {
 	public void login() {
 
 		try {
-			mockMvc.perform(get("/login"))
+			loginMockMvc.perform(get("/login"))
 			.andExpect(status().isOk())
-			.andExpect(view().name("/jsp/front/login"));
+			.andExpect(view().name("/front/login"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -96,31 +111,36 @@ public class FitMusicApplicationTests {
 	public void join() {
 
 		try {
-			mockMvc.perform(get("/join"))
+			joinMockMvc.perform(get("/join"))
 			.andExpect(status().isOk())
-			.andExpect(view().name("/jsp/front/join"));
+			.andExpect(view().name("/front/join"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	
-	public void Join_action() {
+	public void join_action() {
 
 		try {
 			
+			JSONObject json = new JSONObject();
+			json.put("id", "test");
+			json.put("name", "test");
+			json.put("password", "test");
+			
 			MockHttpServletRequestBuilder builder = post("/join_action")
-					.contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-					.param("inputId", "test")
-					.param("inputName", "test")
-					.param("inputPass", "test");
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.content(json.toString());
 			
-			mockMvc.perform(builder)
-			.andExpect(status().is3xxRedirection())
-			.andExpect(redirectedUrl("main"));
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("user", json);
 			
-			User user = loginController.user_search("id", "test");
+			joinMockMvc.perform(builder)
+			.andExpect(status().isOk())
+			.andExpect(content().json(map.toString()));
+			
+			User user = mongoTemplate.findById("test", User.class);
 			assertNotNull(user);
 			assertThat(user.getName(), is("test"));
 			
@@ -144,7 +164,7 @@ public class FitMusicApplicationTests {
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 					.content(json.toString());
 			
-			User user = this.loginController.user_search("_id", json.getString("inputId"));
+			User user = mongoTemplate.findById(json.getString("inputId"), User.class);
 			assertNotNull(user);
 			assertThat(user.getPassword(), is(json.getString("inputPass")));
 			
@@ -152,7 +172,7 @@ public class FitMusicApplicationTests {
 			map1.put("error", null);
 			map1.put("user", user);
 			
-			mockMvc.perform(builder)
+			loginMockMvc.perform(builder)
 			.andDo(print())
 			.andExpect(content().json(map1.toString()))
 			.andExpect(status().isOk());
@@ -170,7 +190,7 @@ public class FitMusicApplicationTests {
 			Map<String, Object> map2 = new HashMap<String, Object>();
 			map2.put("error", "아이디가 존재하지 않습니다.");
 			
-			mockMvc.perform(builder2)
+			loginMockMvc.perform(builder2)
 			.andExpect(content().json(map2.toString()))
 			.andExpect(status().isOk());
 			
@@ -186,10 +206,21 @@ public class FitMusicApplicationTests {
 			Map<String, Object> map3 = new HashMap<String, Object>();
 			map3.put("error", "비밀번호가 일치하지 않습니다.");
 			
-			mockMvc.perform(builder3)
+			loginMockMvc.perform(builder3)
 			.andExpect(content().json(map3.toString()))
 			.andExpect(status().isOk());
 			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void logout(){
+		try {
+			loginMockMvc.perform(get("/logout"))
+			.andExpect(status().isOk());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
