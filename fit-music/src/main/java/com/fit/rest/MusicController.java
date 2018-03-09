@@ -37,12 +37,13 @@ public class MusicController {
 	}
 	
 	@RequestMapping(value="/music_list", method=RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
-	public ModelAndView musicList(@RequestParam Integer page) {
+	public ModelAndView musicList(@RequestParam(name="page", required=false) Integer page) {
 		
-		List<Music> list = musicService.musicList(page);
+//		List<Music> list = musicService.musicList(page);
+		Map<String, Object> map = musicService.musicList(page);
 		
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("list", list);
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		map.put("list", list);
 		
 		ModelAndView mv = new ModelAndView();
 		mv.addAllObjects(map);
@@ -59,6 +60,15 @@ public class MusicController {
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("data", data);
 		mv.setViewName("redirect:music_list?page=1");
+		
+		return mv;
+	}
+	
+	@RequestMapping(value="/music_write", method=RequestMethod.GET)
+	public ModelAndView musicWrite(){
+		
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("/music/musicWrite");
 		
 		return mv;
 	}
