@@ -73,8 +73,8 @@ public class MusicController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/music_create", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
-	public String create(@RequestBody Music input){
+	@RequestMapping(value="/music_create", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	public Music create(@RequestBody Music input){
 		return musicService.create(input);
 	}
 	

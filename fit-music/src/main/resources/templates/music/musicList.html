@@ -8,13 +8,15 @@
 	<!-- 사용자 CSS 추가 -->
 	<!-- <th:block layout:fragment="css">
 	</th:block> -->
-	 
+	
 	<!-- 사용자 스크립트 추가 -->
 	<th:block layout:fragment="script">
 		<script type="text/javascript" th:src="@{/js/music/musicList.js}"></script>
 	</th:block>
+	
 </head>
 <body>
+	
 	<div layout:fragment="content" >
 		<div th:if="${session.loginId == 'dev'}">
 			<a href="music_write">음악 등록</a>
@@ -36,6 +38,14 @@
 	  		<td th:text="${#calendars.format(l.releaseDate, 'yyyy-MM-dd')}"></td>
 	  	</tr>
 	  </table>
+	  
+	  <a th:if="${currentPage != startPage}" th:text="[이전]" th:href="@{music_list(page=${currentPage}-1)}"></a>
+	  <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+	  	<a th:if="${i == currentPage}" th:text="${'['+i+']'}" th:href="@{music_list(page=${i})}"></a>
+	  	<a th:if="${i != currentPage}" th:text="${i}" th:href="@{music_list(page=${i})}"></a>
+	  </span>
+	  <a th:if="${currentPage != endPage}" th:text="[다음]" th:href="@{music_list(page=${currentPage}+1)}"></a>
+	  
 	</div>
 </body>
 </html>

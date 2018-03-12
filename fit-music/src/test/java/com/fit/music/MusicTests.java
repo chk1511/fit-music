@@ -67,29 +67,29 @@ public class MusicTests {
 		}
 	}
 	
-//	@Test
-//	public void musicCreate() {
-//		try {
-//			
-//			String date = "2016-11-10";
-//			Date releaseDate = Date.valueOf(date);
-//			
-//			Music input = new Music();
-//			input.setAlbumTitle("LIFE IS BEAUTY FULL");
-//			input.setReleaseDate(releaseDate);
-//			input.setSinger("문문 (MoonMoon)");
-//			input.setSongTitle("비행운");
-//			
-//			String id = musicController.create(input);
-//			assertNotNull(id);
-//			
-//			mockMvc.perform(get("/music_find/"+id))
-//				.andExpect((model().attributeExists("data")))
-//				.andExpect(redirectedUrl("music_list?page=1"));
-//			
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+	@Test
+	public void musicCreate() {
+		try {
+			
+			String date = "2016-11-10";
+			Date releaseDate = Date.valueOf(date);
+			
+			Music input = new Music();
+			input.setAlbumTitle("LIFE IS BEAUTY FULL");
+			input.setReleaseDate(releaseDate);
+			input.setSinger("문문 (MoonMoon)");
+			input.setSongTitle("비행운");
+			
+			Music result = musicController.create(input);
+			assertNotNull(result);
+			
+			mockMvc.perform(get("/music_find/"+result.getId()))
+				.andExpect((model().attributeExists("data")))
+				.andExpect(redirectedUrl("music_list?page=1"));
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

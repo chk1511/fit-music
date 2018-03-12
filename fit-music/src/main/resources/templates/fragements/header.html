@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 	<header th:fragment="headerFragment"> 
-		<div th:if="${session.loginId != null}">
+		<div th:if="${session.loginId}">
 			<span th:text="${session.loginName}"></span>
 			<span>님 환영합니다!!</span>
 			<a href="logout">로그아웃</a>

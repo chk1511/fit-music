@@ -24,6 +24,18 @@ public class Music {
 	@Field(value="album_title")
 	private String albumTitle;
 	
+	@Field(value="genre")
+	private String genre;
+	
+	@Field(value="singer_type")
+	private String singerType;
+	
+	@Field(value="period")
+	private String period;
+	
+	@Field(value="preference_tf")
+	private Boolean preferenceTf;
+	
 	public String getId() {
 		return id;
 	}
@@ -54,5 +66,28 @@ public class Music {
 	public void setAlbumTitle(String albumTitle) {
 		this.albumTitle = albumTitle;
 	}
-	
+	public String getGenre() {
+		return genre;
+	}
+	public void setGenre(String genre) {
+		this.genre = genre;
+	}
+	public String getSingerType() {
+		return singerType;
+	}
+	public void setSingerType(String singerType) {
+		this.singerType = singerType;
+	}
+	public String getPeriod() {
+		return period;
+	}
+	public void setPeriod(String period) {
+		this.period = period;
+	}
+	public Boolean getPreferenceTf() {
+		return preferenceTf;
+	}
+	public void setPreferenceTf(Boolean preferenceTf) {
+		this.preferenceTf = preferenceTf;
+	}
 }

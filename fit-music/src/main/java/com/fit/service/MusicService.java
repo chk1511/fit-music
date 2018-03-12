@@ -28,26 +28,38 @@ public class MusicService {
 	
 	public Map<String, Object> musicList(Integer page) {
 		
-		// 기본 페이지는 1
-//		page = (page == null ? 1 : page.intValue());
-//		
-//		int startPage = 0;
-//		int 
-//		
-//		Criteria criteria = new Criteria();
-//		
-//		Query query = new Query();
-//		query.limit(15);
-//		query.skip(0);
-//		
-//		Map<String, Object> list= mongoTemplate.find(query, Music.class).limit(15);
-		
-//		Map<String, Object> list = new HashMap<String, Object>();
-//		List<Music> list = mongoTemplate.findAll(Music.class);
-		
-//		List<Music> list = mongoTemplate.find(query, Music.class).limit(10);
-		
 		Map<String, Object> map = new HashMap<String, Object>();
+		
+		// 기본 페이지는 1		
+		int currentPage = (page == null ? 1 : page.intValue());
+		int limit = 3;
+		int startNum = (currentPage - 1) * limit + 1;
+		int endNum = startNum + limit - 1;
+		
+		Query query = new Query();
+		query.limit(limit);
+		query.skip(startNum-1);
+		
+		List<Music> list = mongoTemplate.find(query, Music.class);
+		long listCount = mongoTemplate.count(query, Music.class);
+		
+		// 가장 큰 페이지 번호 계산
+		int maxPage = (int) ((double) listCount / limit + 0.95);
+		// 시작하는 페이지 번호 계산
+		int startPage = (((int) ((double) currentPage / 10 + 0.9)) - 1) * 10 + 1;
+		// 마지막 페이지 번호 계산
+		int endPage = maxPage;
+		if (endPage > (startPage + 9)) {
+			endPage = startPage + 9;
+		}
+		
+		map.put("currentPage", currentPage);
+		map.put("startNum", startNum);
+		map.put("endNum", endNum);
+		map.put("list", list);
+		map.put("maxPage", maxPage);
+		map.put("startPage", startPage);
+		map.put("endPage", endPage);
 		
 		return map;
 	}
@@ -56,9 +68,9 @@ public class MusicService {
 	 * 음악 추가
 	 * @param input
 	 */
-	public String create(Music input) {
+	public Music create(Music input) {
 		mongoTemplate.insert(input);
-		return input.getId();
+		return input;
 	}
 	
 	/**
