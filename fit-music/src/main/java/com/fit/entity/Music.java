@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Document(collection="musics")
 public class Music {
@@ -19,6 +20,7 @@ public class Music {
 	private String singer;
 	
 	@Field(value="release_date")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date releaseDate;
 	
 	@Field(value="album_title")
@@ -35,6 +37,9 @@ public class Music {
 	
 	@Field(value="preference_tf")
 	private Boolean preferenceTf;
+	
+	@Field(value="img_path")
+	private String imgPath;
 	
 	public String getId() {
 		return id;
@@ -89,5 +94,11 @@ public class Music {
 	}
 	public void setPreferenceTf(Boolean preferenceTf) {
 		this.preferenceTf = preferenceTf;
+	}
+	public String getImgPath() {
+		return imgPath;
+	}
+	public void setImgPath(String imgPath) {
+		this.imgPath = imgPath;
 	}
 }

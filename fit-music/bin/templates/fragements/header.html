@@ -5,11 +5,12 @@
 		<div th:if="${session.loginId}">
 			<span th:text="${session.loginName}"></span>
 			<span>님 환영합니다!!</span>
-			<a href="logout">로그아웃</a>
+			<a href="/preference">선호도조사</a>
+			<a href="/logout">로그아웃</a>
 		</div>
 		<div th:unless="${session.loginId}">
 			<i>로그인 해주세요</i>
-			<a href="login">Login</a>
+			<a href="/login">Login</a>
 		</div>
 	</header>
 </html>

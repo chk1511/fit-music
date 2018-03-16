@@ -1,8 +1,9 @@
 package com.fit.rest;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.fit.entity.Music;
 import com.fit.service.MusicService;
+import com.mongodb.WriteResult;
 
 @RestController
 public class MusicController {
@@ -67,16 +70,46 @@ public class MusicController {
 	@RequestMapping(value="/music_write", method=RequestMethod.GET)
 	public ModelAndView musicWrite(){
 		
+		Music music = new Music();
+		music.setReleaseDate(new Date());
+		
 		ModelAndView mv = new ModelAndView();
+		mv.addObject("music", music);
 		mv.setViewName("/music/musicWrite");
 		
 		return mv;
 	}
 	
-	@RequestMapping(value="/music_create", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
-	public Music create(@RequestBody Music input){
-		return musicService.create(input);
+	@RequestMapping(value="/music_create", method=RequestMethod.POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ModelAndView create(HttpServletRequest request, Music input, @RequestParam("file") MultipartFile file){
+		
+		Boolean result = musicService.create(request, input, file);
+		
+		ModelAndView mv = new ModelAndView();
+		
+		if(result){
+			mv.setViewName("redirect:music_list?page=1");
+		}else{
+			mv.setViewName("/music/musicWrite");
+		}
+		
+		return mv;
 	}
 	
+	@RequestMapping(value="/music_update/{id}", method=RequestMethod.GET)
+	public ModelAndView update(@PathVariable String id){
+		
+		Music data = musicService.findOne(id);
+		
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("data", data);
+		mv.setViewName("/music/musicUpdate");
+		
+		return mv;
+	}
 	
+	@RequestMapping(value="/music_update", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	public WriteResult update(@RequestBody Music input){
+		return musicService.update(input);
+	}
 }

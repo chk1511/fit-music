@@ -2,15 +2,24 @@
  * 
  */
 
-function musicCreate(){
+function musicUpdate(){
 	
+	var id = $('#id').val();
 	var songTitle = $('#songTitle').val();
 	var singer = $('#singer').val();
 	var albumTitle = $('#albumTitle').val();
 	var releaseDate = $('#releaseDate').val();
 	var genre = $('#genre').val();
 	var singerType = $('#singerType').val();
+	var period = parseInt(releaseDate);
 	var preferenceTf = $('input:radio[name=preferenceTf]:checked').val();
+	var imgPath = $('#imgPath').val();
+	
+	if(preferenceTf == 'true'){
+		preferenceTf = true;
+	}else{
+		preferenceTf = false;
+	}
 	
 	// 시대 분기
 	if(period >= 2010){
@@ -23,17 +32,25 @@ function musicCreate(){
 		period = 1980;
 	}
 	
-	var data = new FormData($('#form')[0]);
-	
 	$.ajax({
 		type:'POST',
-	 	url:'/music_create',
-	 	data : data,
-	 	processData : false,
-	 	contentType : false,
+	 	url:'/music_update/',
+	 	data : JSON.stringify({
+	 		id : id,
+	 		singer : singer,
+	 		songTitle : songTitle,
+	 		albumTitle : albumTitle,
+	 		releaseDate : releaseDate,
+	 		genre : genre,
+	 		singerType : singerType,
+	 		period : period,
+	 		preferenceTf : preferenceTf
+	 	}),
+	 	dataType: 'JSON',
+	 	contentType: 'application/json',
 	 	success: function(result){
- 			alert('새로운 음악이 등록되었습니다.');
- 			window.location='music_list';
+ 			alert('수정되었습니다.');
+ 			window.location='/music_list?page=1';
 	 	},error: function(xhr, status, error){
 			alert(status);
 	 	}

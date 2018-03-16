@@ -29,16 +29,22 @@
 	  		<td>가수</td>
 	  		<td>앨범</td>
 	  		<td>발매일</td>
+	  		<td></td>
 	  	</tr>
 	  	<tr th:each="l: ${list}">
-	  		<td>1</td>
+	  		<td></td>
 	  		<td th:text="${l.songTitle}"></td>
 	  		<td th:text="${l.singer}"></td>
 	  		<td th:text="${l.albumTitle}"></td>
 	  		<td th:text="${#calendars.format(l.releaseDate, 'yyyy-MM-dd')}"></td>
+	  		<td th:if="${session.loginId == 'dev'}">
+	  			<a th:href="@{'music_update/'+${l.id}}">수정</a>
+	  		</td>
+	  		<td th:if="${session.loginId != 'dev'}"></td>
 	  	</tr>
 	  </table>
 	  
+	  <input type="hidden" id="currentPage" th:value="${currentPage}"/>
 	  <a th:if="${currentPage != startPage}" th:text="[이전]" th:href="@{music_list(page=${currentPage}-1)}"></a>
 	  <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
 	  	<a th:if="${i == currentPage}" th:text="${'['+i+']'}" th:href="@{music_list(page=${i})}"></a>

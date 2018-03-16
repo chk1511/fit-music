@@ -1,16 +1,28 @@
 package com.fit.service;
 
+import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fit.entity.Music;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.WriteResult;
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 @Service
 public class MusicService {
@@ -32,7 +44,7 @@ public class MusicService {
 		
 		// 기본 페이지는 1		
 		int currentPage = (page == null ? 1 : page.intValue());
-		int limit = 3;
+		int limit = 15;
 		int startNum = (currentPage - 1) * limit + 1;
 		int endNum = startNum + limit - 1;
 		
@@ -68,9 +80,30 @@ public class MusicService {
 	 * 음악 추가
 	 * @param input
 	 */
-	public Music create(Music input) {
-		mongoTemplate.insert(input);
-		return input;
+	public Boolean create(HttpServletRequest request, Music input, MultipartFile file) {
+		
+		try {
+			
+			int fileSize = 5 * 1024 * 1024;
+//			saveFolder = request.getSession().getServletContext().getRealPath("img");
+			String savePath = "C:/Users/a/git/fit-music/fit-music/src/main/resources/static/img/music/";
+			
+			File newFile = new File(savePath+file.getOriginalFilename());
+			file.transferTo(newFile);
+			
+//			MultipartRequest multi = new MultipartRequest(request, savePath, fileSize, "utf-8", new DefaultFileRenamePolicy());
+			input.setImgPath(newFile.getPath());
+			
+			mongoTemplate.insert(input);
+			
+			return true;
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+			return false;
+		}
 	}
 	
 	/**
@@ -81,5 +114,19 @@ public class MusicService {
 	public Music findOne(String id) {
 		Music data = mongoTemplate.findById(id, Music.class);
 		return data;
+	}
+	
+	public WriteResult update(Music input){
+		
+		Criteria criteria = new Criteria("id");
+		criteria.is(input.getId());
+		
+		Query query = new Query(criteria);
+		
+		DBObject dbOjc = new BasicDBObject();
+		mongoTemplate.getConverter().write(input, dbOjc);
+		Update update = new Update().fromDBObject(dbOjc);
+		
+		return mongoTemplate.updateFirst(query, update, Music.class);
 	}
 }

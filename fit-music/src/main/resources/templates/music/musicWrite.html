@@ -21,45 +21,55 @@
 	
 		<div layout:fragment="content" >
 			<div th:if="${session.loginId == 'dev'}">
-				<div>
+				
+				<form action="/music_create" id="form" method="post" enctype="multipart/form-data">
 					<label for="songTitle">제목</label>
-				  <input type="text" id="songTitle"/>
+				  <input type="text" id="songTitle" name="songTitle" th:value="${music.songTitle}"/>
 				  <br/>
 				  <label for="singer">가수</label>
-				  <input type="text" id="singer"/>
+				  <input type="text" id="singer" name="singer" th:value="${music.singer}"/>
 				  <br/>
 				  <label for="albumTitle">앨범</label>
-				  <input type="text" id="albumTitle"/>
+				  <input type="text" id="albumTitle" name="albumTitle" th:value="${music.albumTitle}"/>
 				  <br/>
 				  <label for="releaseDate">앨범 발매일</label>
-				  <input type="text" id="releaseDate"/>
+				  <input type="text" id="releaseDate" name="releaseDate" th:value="${#calendars.format(music.releaseDate, 'yyyy-MM-dd')}"/>
 				  <br/>
 				  <label for="genre">장르</label>
-				  <select id="genre">
-				  	<option>장르선택</option>
-				  	<option>발라드</option>
-				  	<option>댄스</option>
-				  	<option>랩/힙합</option>
-				  	<option>R&#38;B/Soul</option>
-				  	<option>인디음악</option>
-				  	<option>록/메탈</option>
-				  	<option>트로트</option>
-				  	<option>포크/블루스</option>
+				  <select id="genre" name="genre" th:field="${music.genre}">
+				  	<option value="">장르선택</option>
+				  	<option value="발라드">발라드</option>
+				  	<option value="댄스">댄스</option>
+				  	<option value="랩/힙합">랩/힙합</option>
+				  	<option value="R&#38;B/Soul">R&#38;B/Soul</option>
+				  	<option value="인디음악">인디음악</option>
+				  	<option value="록/메탈">록/메탈</option>
+				  	<option value="트로트">트로트</option>
+				  	<option value="포크/블루스">포크/블루스</option>
+				  	<option value="POP">POP</option>
 				  </select>
 				  <br/>
 				  <label for="singerType">타입</label>
-				  <select id="singerType">
-				  	<option>타입선택</option>
-				  	<option>여성솔로</option>
-				  	<option>남성솔로</option>
-				  	<option>여성그룹</option>
-				  	<option>남성그룹</option>
-				  	<option>혼성그룹</option>
+				  <select id="singerType" name="singerType" th:field="${music.singerType}">
+				  	<option value="">타입선택</option>
+				  	<option value="여성솔로">여성솔로</option>
+				  	<option value="남성솔로">남성솔로</option>
+				  	<option value="여성그룹">여성그룹</option>
+				  	<option value="남성그룹">남성그룹</option>
+				  	<option value="혼성그룹">혼성그룹</option>
 				  </select>
 				  <br/>
+				  <input type="file" name="file"/>
+				  <p>선호도 조사에 사용하겠습니까?</p>
+				  <label><input type="radio" name="preferenceTf" value="true"/>네</label>
+				  <label><input type="radio" name="preferenceTf" value="false" checked="checked"/>아니오</label>
+				  <br/>
 				  <button type="button" id="musicWriteBtn" onclick="musicCreate()">등록</button>
-			  </div>
+				  <!-- <input type="submit" id="musicWriteBtn" value="등록"/> -->
+			  </form>
+			  
 		  </div>
+		  
 		  <div th:if="${session.loginId != 'dev'}">
 				<p>접근 권한이 없습니다.</p>
 			</div>

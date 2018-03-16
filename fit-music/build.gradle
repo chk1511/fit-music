@@ -24,6 +24,7 @@ repositories {
 
 
 dependencies {
+	compile group: 'servlets.com', name: 'cos', version: '05Nov2002'
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-devtools')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
