@@ -20,22 +20,23 @@
 	
 		<div layout:fragment="content" >
 			<div th:if="${session.loginId == 'dev'}">
-				<div>
-					<input type="hidden" id="id" th:value="${data.id}"/>
+				<form action="/music_update" id="form" method="post" enctype="multipart/form-data">
+					<input type="hidden" id="currentPage" name="currentPage" th:value="${currentPage}"/>
+					<input type="hidden" id="id" name="id" th:value="${data.id}"/>
 					<label for="songTitle">제목</label>
-				  <input type="text" id="songTitle" th:value="${data.songTitle}"/>
+				  <input type="text" id="songTitle" name="songTitle" th:value="${data.songTitle}"/>
 				  <br/>
 				  <label for="singer">가수</label>
-				  <input type="text" id="singer" th:value="${data.singer}"/>
+				  <input type="text" id="singer" name="singer" th:value="${data.singer}"/>
 				  <br/>
 				  <label for="albumTitle">앨범</label>
-				  <input type="text" id="albumTitle" th:value="${data.albumTitle}"/>
+				  <input type="text" id="albumTitle" name="albumTitle" th:value="${data.albumTitle}"/>
 				  <br/>
 				  <label for="releaseDate">앨범 발매일</label>
-				  <input type="text" id="releaseDate" th:value="${#calendars.format(data.releaseDate, 'yyyy-MM-dd')}"/>
+				  <input type="text" id="releaseDate" name="releaseDate" th:value="${#calendars.format(data.releaseDate, 'yyyy-MM-dd')}"/>
 				  <br/>
 				  <label for="genre">장르</label>
-				  <select id="genre" th:field="${data.genre}">
+				  <select id="genre" name="genre" th:field="${data.genre}">
 				  	<option value="">장르선택</option>
 				  	<option value="발라드">발라드</option>
 				  	<option value="댄스">댄스</option>
@@ -49,7 +50,7 @@
 				  </select>
 				  <br/>
 				  <label for="singerType">타입</label>
-				  <select id="singerType" th:field="${data.singerType}">
+				  <select id="singerType" name="singerType" th:field="${data.singerType}">
 				  	<option value="타입선택">타입선택</option>
 				  	<option value="여성솔로">여성솔로</option>
 				  	<option value="남성솔로">남성솔로</option>
@@ -57,23 +58,30 @@
 				  	<option value="남성그룹">남성그룹</option>
 				  	<option value="혼성그룹">혼성그룹</option>
 				  </select>
+				  
 				  <br/>
-				  <label for="imgPath">이미지</label>
-				  <input type="file" id="imgPath"/>
+				  
+				  <input type="hidden" id="imgPath" name="imgPath" th:value="${data.imgPath}"/>
+				  <img id="albumImg" th:src="@{${data.imgPath}}" style="display:none;" width="100" height="100"/>
+					  
+				  <button type="button" id="imgChangeBtn" onclick="imgChangeBtnClick()" style="display:none;">이미지 바꾸기</button>
+				  <input type="file" id="file" name="file" style="display: none;" onchange="imgChanged(this)"/>		
 				  <br/>
+				  
 				  <p>선호도 조사에 사용하겠습니까?</p>
-				  <div th:if="${data.preferenceTf == true}">
+				  <div th:if="${data.preferenceTf}">
 					  <label><input type="radio" name="preferenceTf" value="true" checked="checked"/>네</label>
 					  <label><input type="radio" name="preferenceTf" value="false"/>아니오</label>
 				  </div>
-				  <div th:if="${data.preferenceTf == false}">
+				  <div th:unless="${data.preferenceTf}">
 					  <label><input type="radio" name="preferenceTf" value="true"/>네</label>
 					  <label><input type="radio" name="preferenceTf" value="false" checked="checked"/>아니오</label>
 				  </div>				  
 				  <br/>
-				  <button type="button" id="musicWriteBtn" onclick="musicUpdate()">등록</button>
-			  </div>
-		  </div>
+				  <button type="button" id="musicUpdateBtn" onclick="musicUpdate()">등록</button>
+			   </form>
+		 	</div>
+		 
 		  <div th:if="${session.loginId != 'dev'}">
 				<p>접근 권한이 없습니다.</p>
 			</div>

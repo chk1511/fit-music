@@ -56,6 +56,7 @@ public class JoinService {
 			error = "같은 아이디가 존재합니다.";
 			map.put("error", error);
 		}else{
+			input.setPreferenceTf(false);
 			mongoTemplate.insert(input);
 			map.put("user", input);
 		}

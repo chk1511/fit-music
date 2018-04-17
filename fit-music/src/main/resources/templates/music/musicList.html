@@ -18,6 +18,7 @@
 <body>
 	
 	<div layout:fragment="content" >
+		
 		<div th:if="${session.loginId == 'dev'}">
 			<a href="music_write">음악 등록</a>
 		</div>
@@ -38,7 +39,7 @@
 	  		<td th:text="${l.albumTitle}"></td>
 	  		<td th:text="${#calendars.format(l.releaseDate, 'yyyy-MM-dd')}"></td>
 	  		<td th:if="${session.loginId == 'dev'}">
-	  			<a th:href="@{'music_update/'+${l.id}}">수정</a>
+	  			<a th:href="@{'music_update/'+${l.id}(page=${currentPage})}">수정</a>
 	  		</td>
 	  		<td th:if="${session.loginId != 'dev'}"></td>
 	  	</tr>

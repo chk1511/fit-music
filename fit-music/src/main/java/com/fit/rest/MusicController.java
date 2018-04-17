@@ -1,10 +1,13 @@
 package com.fit.rest;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tomcat.jni.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
@@ -81,35 +84,25 @@ public class MusicController {
 	}
 	
 	@RequestMapping(value="/music_create", method=RequestMethod.POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ModelAndView create(HttpServletRequest request, Music input, @RequestParam("file") MultipartFile file){
-		
-		Boolean result = musicService.create(request, input, file);
-		
-		ModelAndView mv = new ModelAndView();
-		
-		if(result){
-			mv.setViewName("redirect:music_list?page=1");
-		}else{
-			mv.setViewName("/music/musicWrite");
-		}
-		
-		return mv;
+	public Boolean create(HttpServletRequest request, Music input, @RequestParam("file") MultipartFile file){		
+		return musicService.create(request, input, file);
 	}
 	
 	@RequestMapping(value="/music_update/{id}", method=RequestMethod.GET)
-	public ModelAndView update(@PathVariable String id){
+	public ModelAndView update(@PathVariable String id, @RequestParam(name="page", required=false) Integer page){
 		
 		Music data = musicService.findOne(id);
 		
 		ModelAndView mv = new ModelAndView();
 		mv.addObject("data", data);
+		mv.addObject("currentPage", page);
 		mv.setViewName("/music/musicUpdate");
 		
 		return mv;
 	}
 	
-	@RequestMapping(value="/music_update", method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
-	public WriteResult update(@RequestBody Music input){
-		return musicService.update(input);
+	@RequestMapping(value="/music_update", method=RequestMethod.POST, consumes=MediaType.MULTIPART_FORM_DATA_VALUE, produces=MediaType.APPLICATION_JSON_VALUE)
+	public WriteResult update(HttpServletRequest request, Music input, @RequestParam("file") MultipartFile file){
+		return musicService.update(request, input, file);
 	}
 }

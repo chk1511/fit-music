@@ -1,12 +1,14 @@
 package com.fit.service;
 
 import java.io.File;
-import java.net.URL;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,6 @@ import com.fit.entity.Music;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
-import com.oreilly.servlet.MultipartRequest;
-import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 @Service
 public class MusicService {
@@ -84,16 +84,45 @@ public class MusicService {
 		
 		try {
 			
-			int fileSize = 5 * 1024 * 1024;
-//			saveFolder = request.getSession().getServletContext().getRealPath("img");
-			String savePath = "C:/Users/a/git/fit-music/fit-music/src/main/resources/static/img/music/";
+			// 시대 값 넣어줌
+			input.setPeriod(this.getPeriod(input.getReleaseDate()));
 			
-			File newFile = new File(savePath+file.getOriginalFilename());
-			file.transferTo(newFile);
+			int fileSize = 5 * 1024 * 1024;
+			
+			String rootPath = this.getClass().getResource("../../../").getPath();
+			String savePath = "static/img/music/";
+			String fileName = file.getOriginalFilename();
+			String filePath = rootPath+savePath+fileName;
+			
+			File newFile = new File(filePath);
+			
+			// 파일이 이미 존재할 경우
+			if(newFile.exists()){
+				if (newFile.isDirectory()) {
+	                throw new IOException("File '" + file + "' exists but is a directory");
+	            }
+	            if (newFile.canWrite() == false) {
+	                throw new IOException("File '" + file + "' cannot be written to");
+	            }
+			}else{
+				File parent = newFile.getParentFile();
+	            if (parent != null) {
+	                if (!parent.mkdirs() && !parent.isDirectory()) {
+	                    throw new IOException("Directory '" + parent + "' could not be created");
+	                }
+	            }
+	            file.transferTo(newFile);
+			}
+			
+			input.setImgFileName(file.getOriginalFilename());
+			input.setImgPath(newFile.getParent().trim());
 			
 //			MultipartRequest multi = new MultipartRequest(request, savePath, fileSize, "utf-8", new DefaultFileRenamePolicy());
-			input.setImgPath(newFile.getPath());
+//			input.setImgPath(newFile.getParent().trim()+newFile.getName().trim());
 			
+//			String imgPath = multi.getFilesystemName((String) multi.getFileNames().nextElement());
+//			input.setImgPath(imgPath);
+//			
 			mongoTemplate.insert(input);
 			
 			return true;
@@ -116,17 +145,78 @@ public class MusicService {
 		return data;
 	}
 	
-	public WriteResult update(Music input){
+	public WriteResult update(HttpServletRequest request, Music input, MultipartFile file){
 		
-		Criteria criteria = new Criteria("id");
-		criteria.is(input.getId());
-		
-		Query query = new Query(criteria);
-		
-		DBObject dbOjc = new BasicDBObject();
-		mongoTemplate.getConverter().write(input, dbOjc);
-		Update update = new Update().fromDBObject(dbOjc);
-		
-		return mongoTemplate.updateFirst(query, update, Music.class);
+		try {
+			
+			if(!file.getOriginalFilename().isEmpty()){
+
+				String rootPath = this.getClass().getResource("../../../").getPath();
+				String savePath = "static/img/music/";
+				String fileName = file.getOriginalFilename();
+				String filePath = rootPath+savePath+fileName;
+				
+				File newFile = new File(filePath);
+				
+				// 파일이 이미 존재할 경우
+				if(!newFile.exists()){
+					File parent = newFile.getParentFile();
+		            if (parent != null) {
+		                if (!parent.mkdirs() && !parent.isDirectory()) {
+		                    throw new IOException("Directory '" + parent + "' could not be created");
+		                }
+		            }
+		            file.transferTo(newFile);
+				}
+				input.setImgFileName(file.getOriginalFilename());
+				input.setImgPath("/img/music/"+file.getOriginalFilename());
+			}
+			
+			input.setPeriod(this.getPeriod(input.getReleaseDate()));
+			
+			Criteria criteria = new Criteria("id");
+			criteria.is(input.getId());
+			
+			Query query = new Query(criteria);
+			
+			DBObject dbOjc = new BasicDBObject();
+			mongoTemplate.getConverter().write(input, dbOjc);
+			Update update = new Update().fromDBObject(dbOjc);
+			
+			return mongoTemplate.updateFirst(query, update, Music.class);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	 * 발매날짜를 기준으로 시대 구분
+	 * @param releaseDate
+	 * @return
+	 */
+	private String getPeriod(Date releaseDate) {
+		if(releaseDate != null){
+			
+			SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+			String dateStr = transFormat.format(releaseDate);
+			int dateInt = Integer.parseInt(dateStr.substring(0,4));
+			String period;
+			
+			if(dateInt >= 2010){
+				period = "2010";
+			}else if(dateInt < 2010 && dateInt >= 2000){
+				period = "2000";
+			}else if(dateInt < 2000 && dateInt >= 1990){
+				period = "1990";
+			}else{
+				period = "1980";
+			}
+			
+			return period;
+		}else{
+			return null;
+		}
 	}
 }

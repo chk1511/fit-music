@@ -1,11 +1,9 @@
 package com.fit.service;
 
-import static org.mockito.Matchers.intThat;
-
-import java.security.cert.Certificate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,9 +13,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.fit.entity.Music;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import com.fit.entity.Preference;
+import com.fit.entity.User;
 
 @Service
 public class PreferenceService {
@@ -48,5 +45,39 @@ public class PreferenceService {
 		List<Music> data = mongoTemplate.find(query, Music.class);
 		
 		return data;
+	}
+	
+	/**
+	 * Create Preference
+	 * @param req
+	 * @param list
+	 * @return
+	 */
+	public Boolean create(HttpServletRequest req, List<Preference> list) {
+		
+		HttpSession session = req.getSession();
+		String loginId = (String) session.getAttribute("loginId");
+		
+		if(loginId != null){
+			
+			for( Preference l : list){
+				l.setUserId(loginId);
+				mongoTemplate.insert(l);
+			}
+			
+			Criteria criteria = new Criteria("id");
+			criteria.is(loginId);
+			
+			Query query = new Query(criteria);
+			
+			Update update = new Update();
+			update.set("preference_tf", true);
+			
+			mongoTemplate.updateFirst(query, update, User.class);
+			
+			return true;
+		}else{
+			return false;
+		}
 	}
 }

@@ -12,17 +12,6 @@ function musicCreate(){
 	var singerType = $('#singerType').val();
 	var preferenceTf = $('input:radio[name=preferenceTf]:checked').val();
 	
-	// 시대 분기
-	if(period >= 2010){
-		period = 2010;
-	}else if(period < 2010 && period >= 2000){
-		period = 2000;
-	}else if(period < 2000 && period >= 1990){
-		period = 1990;
-	}else{
-		period = 1980;
-	}
-	
 	var data = new FormData($('#form')[0]);
 	
 	$.ajax({
@@ -32,8 +21,10 @@ function musicCreate(){
 	 	processData : false,
 	 	contentType : false,
 	 	success: function(result){
- 			alert('새로운 음악이 등록되었습니다.');
- 			window.location='music_list';
+	 		if(result){
+	 			alert('새로운 음악이 등록되었습니다.');
+	 			window.location='music_list';
+	 		}
 	 	},error: function(xhr, status, error){
 			alert(status);
 	 	}

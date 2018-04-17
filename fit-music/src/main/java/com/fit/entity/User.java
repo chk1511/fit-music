@@ -2,6 +2,7 @@ package com.fit.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Document(collection="users")
 public class User {
@@ -10,6 +11,9 @@ public class User {
 	private String id;
 	private String password;
 	private String name;
+	
+	@Field(value="preference_tf")
+	private Boolean preferenceTf;
 	
 	public String getId() {
 		return id;
@@ -28,5 +32,11 @@ public class User {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public Boolean getPreferenceTf() {
+		return preferenceTf;
+	}
+	public void setPreferenceTf(Boolean preferenceTf) {
+		this.preferenceTf = preferenceTf;
 	}
 }

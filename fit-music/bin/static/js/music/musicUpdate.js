@@ -4,61 +4,82 @@
 
 function musicUpdate(){
 	
-	var id = $('#id').val();
-	var songTitle = $('#songTitle').val();
-	var singer = $('#singer').val();
-	var albumTitle = $('#albumTitle').val();
-	var releaseDate = $('#releaseDate').val();
-	var genre = $('#genre').val();
-	var singerType = $('#singerType').val();
-	var period = parseInt(releaseDate);
-	var preferenceTf = $('input:radio[name=preferenceTf]:checked').val();
-	var imgPath = $('#imgPath').val();
-	
-	if(preferenceTf == 'true'){
-		preferenceTf = true;
-	}else{
-		preferenceTf = false;
-	}
-	
-	// 시대 분기
-	if(period >= 2010){
-		period = 2010;
-	}else if(period < 2010 && period >= 2000){
-		period = 2000;
-	}else if(period < 2000 && period >= 1990){
-		period = 1990;
-	}else{
-		period = 1980;
-	}
+	var currentPage = $('#currentPage').val();
+	var data = new FormData($('#form')[0]);
 	
 	$.ajax({
 		type:'POST',
-	 	url:'/music_update/',
-	 	data : JSON.stringify({
-	 		id : id,
-	 		singer : singer,
-	 		songTitle : songTitle,
-	 		albumTitle : albumTitle,
-	 		releaseDate : releaseDate,
-	 		genre : genre,
-	 		singerType : singerType,
-	 		period : period,
-	 		preferenceTf : preferenceTf
-	 	}),
-	 	dataType: 'JSON',
-	 	contentType: 'application/json',
+	 	url:'/music_update',
+	 	data : data,
+	 	processData : false,
+	 	contentType : false,
 	 	success: function(result){
  			alert('수정되었습니다.');
- 			window.location='/music_list?page=1';
+ 			window.location='/music_list?page='+currentPage;
 	 	},error: function(xhr, status, error){
 			alert(status);
 	 	}
 	});
 }
 
+function imgChangeBtnClick() {
+	$('#imgChangeBtn').css('display', 'none');
+	$('#file').css('display', 'block');
+}
+
+/**
+ * 이미지 미리보기
+ * @param e
+ * @returns
+ */
+function imgChanged(e) {
+	var file = e.value;
+	$('#albumImg').attr('src', file);
+	
+	var inputFile = e;
+	
+	// image 파일만
+    if (!inputFile.files[0].type.match(/image\//)) return;
+
+    // preview
+    try {
+        var reader = new FileReader();
+        reader.onload = function(e){
+            $('#albumImg').attr('src', e.target.result);
+        }
+        reader.readAsDataURL(inputFile.files[0]);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+/**
+ * 페이지 로드 시 이미지 삽입
+ * @returns
+ */
+function insertImg(){
+	
+	// img file 있는지 확인
+	if($('#imgPath').val()){
+		
+		// 앨범 이미지 출력하고, 패스 지정
+		$('#albumImg').css('display', 'block');
+		$('#albumImg').attr('src', $('#imgPath').val());
+		
+		// 이미지바꾸기 버튼 출력
+		$('#imgChangeBtn').css('display', 'block');
+	}
+}
+
 $(document).ready(function(){
 	$( "#releaseDate" ).datepicker({
 	    dateFormat: 'yy-mm-dd'
 	});
+	
+	$('#imgChangeBtn').click(function() {
+		$('#fileDiv').css('display','block');
+		$('#imgChangeBtn').css('display','none');
+	});
+	
+	insertImg();
 });

@@ -1,18 +1,11 @@
 package com.fit.music;
 
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import java.sql.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fit.entity.Music;
-import com.fit.rest.MusicController;
 import com.fit.rest.PreferenceController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -56,6 +47,36 @@ public class PreferenceTests {
 			mockMvc.perform(get("/preference"))
 				.andExpect(status().isOk())
 				.andExpect(view().name("/preference/preferenceMake"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void create() {
+		try {
+			
+			JSONObject json1 = new JSONObject();
+			json1.put("musicId", "5aa65e2f78bb4d94ac0837d9");
+			json1.put("score", "5");
+			
+			JSONObject json2 = new JSONObject();
+			json2.put("musicId", "5aa65de578bb4d94ac0837d8");
+			json2.put("score", "5");
+			
+			JSONArray arr = new JSONArray();
+			arr.put(json1);
+			arr.put(json2);
+			
+			MockHttpServletRequestBuilder builder = post("/preference_create")
+			.contentType(MediaType.APPLICATION_JSON_VALUE)
+			.sessionAttr("loginId", "user")
+			.content(arr.toString());
+			
+			mockMvc.perform(builder)
+			.andExpect(status().isOk());		
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

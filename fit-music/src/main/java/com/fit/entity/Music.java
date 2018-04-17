@@ -41,6 +41,9 @@ public class Music {
 	@Field(value="img_path")
 	private String imgPath;
 	
+	@Field(value="img_file_name")
+	private String imgFileName;
+	
 	public String getId() {
 		return id;
 	}
@@ -100,5 +103,11 @@ public class Music {
 	}
 	public void setImgPath(String imgPath) {
 		this.imgPath = imgPath;
+	}
+	public String getImgFileName() {
+		return imgFileName;
+	}
+	public void setImgFileName(String imgFileName) {
+		this.imgFileName = imgFileName;
 	}
 }
