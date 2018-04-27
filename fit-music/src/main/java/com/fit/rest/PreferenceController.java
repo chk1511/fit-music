@@ -5,7 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,19 +20,7 @@ import com.fit.service.PreferenceService;
 public class PreferenceController {
 	
 	@Autowired
-	MongoTemplate mongoTemplate;
-	
-	@Autowired
 	PreferenceService preferenceService;
-
-	public PreferenceController() {
-		
-	}
-	
-	public PreferenceController(MongoTemplate mongo) {
-		// TODO Auto-generated constructor stub
-		preferenceService = new PreferenceService(mongo);
-	}
 	
 	@RequestMapping(value="/preference", method=RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ModelAndView list(){

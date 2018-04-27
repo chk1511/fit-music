@@ -1,7 +1,6 @@
 package com.fit.service;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,33 +9,26 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
+import org.hibernate.Criteria;
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fit.entity.Music;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import com.fit.entity.Preference;
+import com.fit.repository.MusicRepository;
 
 @Service
 public class MusicService {
 
 	@Autowired
-	MongoTemplate mongoTemplate;
-	
-	public MusicService() {
-		
-	}
-	
-	public MusicService(MongoTemplate mongo) {
-		mongoTemplate = mongo;
-	}
+	MusicRepository musicRepository;
 	
 	public Map<String, Object> musicList(Integer page) {
 		
@@ -48,12 +40,10 @@ public class MusicService {
 		int startNum = (currentPage - 1) * limit + 1;
 		int endNum = startNum + limit - 1;
 		
-		Query query = new Query();
-		query.limit(limit);
-		query.skip(startNum-1);
+		PageRequest pageRequest = new PageRequest(currentPage, limit, null);
+		Page<Music> list = musicRepository.findByPage(pageRequest);
 		
-		List<Music> list = mongoTemplate.find(query, Music.class);
-		long listCount = mongoTemplate.count(query, Music.class);
+		int listCount  = list.getSize();
 		
 		// 가장 큰 페이지 번호 계산
 		int maxPage = (int) ((double) listCount / limit + 0.95);
@@ -77,10 +67,48 @@ public class MusicService {
 	}
 	
 	/**
+	 * 추천 음악 리스트 가져오는 로직
+	 * @return
+	 */
+//	public Map<String, Object> recommendation(HttpServletRequest req, Integer page) {
+//		
+//		// 페이징 처리
+//		Map<String, Object> map = new HashMap<String, Object>();
+//		
+//		HttpSession session = req.getSession();
+//		String loginId = (String) session.getAttribute("loginId");
+//		
+//		if(loginId == null){
+//			return null;
+//		}
+//		
+//		// 1. 사용자가 고른 음악리스트 선별
+//		Criteria criteria = new Criteria("user_id");
+//		criteria.is(loginId);
+//		
+//		Query query = new Query(criteria);
+//		query.fields().include("music_id");
+//		
+//		List<Preference> data = mongoTemplate.find(query, Preference.class);
+//		
+//		// 2. 사용자가 고른 음악을 고른 다른 사용자들을 추출
+//		BasicDBObject obj = new BasicDBObject();
+//		for(Preference p : data){
+//			obj.put("music_id", new BasicDBObject("$eq", p.getMusicId()));
+//		}
+//		
+//		List<Preference> user = mongoTemplate.find(query, Preference.class);
+//		
+//		map.put("user", user);
+//		
+//		return map;
+//	}
+	
+	/**
 	 * 음악 추가
 	 * @param input
 	 */
-	public Boolean create(HttpServletRequest request, Music input, MultipartFile file) {
+	public Music create(HttpServletRequest request, Music input, MultipartFile file) {
 		
 		try {
 			
@@ -123,15 +151,15 @@ public class MusicService {
 //			String imgPath = multi.getFilesystemName((String) multi.getFileNames().nextElement());
 //			input.setImgPath(imgPath);
 //			
-			mongoTemplate.insert(input);
+			Music result = musicRepository.save(input);
 			
-			return true;
+			return result;
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			
-			return false;
+			return null;
 		}
 	}
 	
@@ -140,12 +168,12 @@ public class MusicService {
 	 * @param id
 	 * @return
 	 */
-	public Music findOne(String id) {
-		Music data = mongoTemplate.findById(id, Music.class);
+	public Music findOne(int id) {
+		Music data = musicRepository.findOne(id);
 		return data;
 	}
 	
-	public WriteResult update(HttpServletRequest request, Music input, MultipartFile file){
+	public Boolean update(HttpServletRequest request, Music input, MultipartFile file){
 		
 		try {
 			
@@ -183,11 +211,15 @@ public class MusicService {
 			mongoTemplate.getConverter().write(input, dbOjc);
 			Update update = new Update().fromDBObject(dbOjc);
 			
-			return mongoTemplate.updateFirst(query, update, Music.class);
+			mongoTemplate.updateFirst(query, update, Music.class);
+			
+			musicRepository.update
+			
+			return true;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+			return false;
 		}
 	}
 	

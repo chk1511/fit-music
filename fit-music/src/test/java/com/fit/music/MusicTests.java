@@ -1,6 +1,5 @@
 package com.fit.music;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.queryParam;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.fileUpload;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,7 +51,7 @@ public class MusicTests {
 		mockMvc = MockMvcBuilders.standaloneSetup(musicController).build();
 	}
 	
-	@Test
+//	@Test
 	public void musicList() {
 		try {
 			mockMvc.perform(get("/music_list?page=1"))
@@ -65,6 +64,22 @@ public class MusicTests {
 	}
 	
 	@Test
+	public void recommendation() {
+		try{
+			
+			MockHttpServletRequestBuilder builder = get("/recommendation?page=1")
+					.sessionAttr("loginId", "user");
+			
+			mockMvc.perform(builder)
+					.andExpect(status().isOk())
+					.andExpect(view().name("/music/musicList"));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+//	@Test
 	public void musicWrite() {
 		try {			
 			mockMvc.perform(get("/music_write"))
@@ -76,7 +91,7 @@ public class MusicTests {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void musicCreate() {
 		try {
 			

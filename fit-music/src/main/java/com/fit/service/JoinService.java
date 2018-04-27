@@ -4,25 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.fit.entity.User;
+import com.fit.repository.UserRepository;
 
 @Service
 public class JoinService {
 	
 	@Autowired
-	MongoTemplate mongoTemplate;
-	
-	public JoinService() {
-	}
-	
-	public JoinService(MongoTemplate mongo) {
-		mongoTemplate = mongo;
-	}
+	UserRepository userRepository ;
 	
 	/**
 	 * 아이디 중복검사
@@ -31,7 +22,7 @@ public class JoinService {
 	 */
 	public Boolean idCheck(String id){
 		
-		User user = mongoTemplate.findById(id, User.class);
+		User user = userRepository.findOne(id);
 		
 		if(user != null){
 			return false;
@@ -50,14 +41,17 @@ public class JoinService {
 		String error = null;
 		Map<String, Object> map = new HashMap<String, Object>();
 		
-		User user = mongoTemplate.findById(input.getId(), User.class);
+		User user = userRepository.findOne(input.getId());
 		
 		if(user != null){
 			error = "같은 아이디가 존재합니다.";
 			map.put("error", error);
 		}else{
-			input.setPreferenceTf(false);
-			mongoTemplate.insert(input);
+			// 처음 가입시 기본은 선호도조사 false 상태이다
+			input.setPreference(false);
+			
+			userRepository.save(input);
+			
 			map.put("user", input);
 		}
 		return map;

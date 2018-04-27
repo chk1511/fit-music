@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,21 +19,7 @@ import com.fit.service.LoginService;
 public class LoginController {
 	
 	@Autowired
-	MongoTemplate mongoTemplate;
-	
-	@Autowired
 	LoginService loginService;
-	
-	
-	public LoginController() {
-		
-	}
-	
-	public LoginController(MongoTemplate mongo) {
-		// TODO Auto-generated constructor stub
-		mongoTemplate = mongo;
-		loginService = new LoginService(mongo);
-	}
 	
 	@RequestMapping("/login")
 	public ModelAndView login() {

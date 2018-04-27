@@ -1,46 +1,50 @@
 package com.fit.entity;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Document(collection="preferences")
+@Entity
+@Table(name="preferences")
 public class Preference {
 	
 	@Id
-	private String id;
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private int id;
 	
-	@Field(value="music_id")
-	private String musicId;
+	@Column(name="music_id")
+	private int musicId;
 
-	@Field(value="user_id")
-	private String userId;
+	@Column(name="user_id")
+	private int userId;
 	
-	@Field(value="score")
+	@Column(name="score")
 	private String score;
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public String getMusicId() {
+	public int getMusicId() {
 		return musicId;
 	}
 
-	public void setMusicId(String musicId) {
+	public void setMusicId(int musicId) {
 		this.musicId = musicId;
 	}
 
-	public String getUserId() {
+	public int getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(int userId) {
 		this.userId = userId;
 	}
 

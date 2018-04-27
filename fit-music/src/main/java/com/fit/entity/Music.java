@@ -2,52 +2,58 @@ package com.fit.entity;
 
 import java.util.Date;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
-@Document(collection="musics")
+@Entity
+@Table ( name = "musics")
 public class Music {
 
 	@Id
-	private String id;
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private int id;
 	
-	@Field(value="song_title")
+	@Column(name="song_title")
 	private String songTitle;
 	
-	@Field(value="singer")
+	@Column(name="singer")
 	private String singer;
 	
-	@Field(value="release_date")
+	@Column(name="release_date")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date releaseDate;
 	
-	@Field(value="album_title")
+	@Column(name="album_title")
 	private String albumTitle;
 	
-	@Field(value="genre")
+	@Column(name="genre")
 	private String genre;
 	
-	@Field(value="singer_type")
+	@Column(name="singer_type")
 	private String singerType;
 	
-	@Field(value="period")
+	@Column(name="period")
 	private String period;
 	
-	@Field(value="preference_tf")
-	private Boolean preferenceTf;
+	@Column(name="preference")
+	private Boolean preference;
 	
-	@Field(value="img_path")
+	@Column(name="img_path")
 	private String imgPath;
 	
-	@Field(value="img_file_name")
+	@Column(name="img_file_name")
 	private String imgFileName;
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getSongTitle() {
@@ -92,11 +98,11 @@ public class Music {
 	public void setPeriod(String period) {
 		this.period = period;
 	}
-	public Boolean getPreferenceTf() {
-		return preferenceTf;
+	public Boolean getPreference() {
+		return preference;
 	}
-	public void setPreferenceTf(Boolean preferenceTf) {
-		this.preferenceTf = preferenceTf;
+	public void setPreferenceTf(Boolean preference) {
+		this.preference = preference;
 	}
 	public String getImgPath() {
 		return imgPath;

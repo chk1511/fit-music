@@ -71,7 +71,7 @@ public class PreferenceTests {
 			
 			MockHttpServletRequestBuilder builder = post("/preference_create")
 			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.sessionAttr("loginId", "user")
+			.sessionAttr("loginId", "dev")
 			.content(arr.toString());
 			
 			mockMvc.perform(builder)

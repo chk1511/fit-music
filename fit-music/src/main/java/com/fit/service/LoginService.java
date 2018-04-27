@@ -7,29 +7,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.fit.entity.User;
+import com.fit.repository.UserRepository;
 
 @Service
 public class LoginService {
 	
 	@Autowired
-	MongoTemplate mongoTemplate;
+	UserRepository userRepository;
 
 	@Autowired
 	JoinService joinService;
-	
-	public LoginService() {
-		
-	}
-	
-	public LoginService(MongoTemplate mongo) {
-		mongoTemplate = mongo;
-	}
 	
 	/**
 	 * 로그인
@@ -43,7 +33,7 @@ public class LoginService {
 		Map<String, Object> map = new HashMap<String, Object>();
 		String error = null;
 		
-		User user = mongoTemplate.findById(input.getId(), User.class);
+		User user = userRepository.findOne(input.getId());
 		
 		if(user != null){
 			if(user.getPassword().equals(input.getPassword())){

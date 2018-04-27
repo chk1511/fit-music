@@ -65,6 +65,7 @@ public class PreferenceService {
 				mongoTemplate.insert(l);
 			}
 			
+			// 선호도조사가 완료되면 사용자 정보에 완료정보 추가
 			Criteria criteria = new Criteria("id");
 			criteria.is(loginId);
 			
