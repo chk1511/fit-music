@@ -1,36 +1,41 @@
 package com.fit.music;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import init.Init;
+import com.fit.rest.MainController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = { "com.fit.*" })
-@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
 public class InitTests {
 	
-	@Autowired
-	private Init init;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
+	@InjectMocks
+	private MainController mainController;
+	private MockMvc mockMvc;
 
 	@Before
 	public void setup() {
-		
-		init = new Init(mongoTemplate);
+		mockMvc = MockMvcBuilders.standaloneSetup(mainController).build();
 	}
 	
 	@Test
-	public void music() {
-		init.music();
-		
+	public void index() {
+
+		try {
+			mockMvc.perform(get("/"))
+			.andExpect(redirectedUrl("main"));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

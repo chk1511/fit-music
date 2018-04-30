@@ -83,7 +83,7 @@ public class MusicController {
 	}
 	
 	@RequestMapping(value="/music_update/{id}", method=RequestMethod.GET)
-	public ModelAndView update(@PathVariable String id, @RequestParam(name="page", required=false) Integer page){
+	public ModelAndView update(@PathVariable int id, @RequestParam(name="page", required=false) Integer page){
 		
 		Music data = musicService.findOne(id);
 		

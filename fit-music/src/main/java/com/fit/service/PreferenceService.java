@@ -6,29 +6,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import com.fit.entity.Music;
 import com.fit.entity.Preference;
 import com.fit.entity.User;
+import com.fit.repository.MusicRepository;
+import com.fit.repository.PreferenceRepository;
+import com.fit.repository.UserRepository;
 
 @Service
 public class PreferenceService {
 
 	@Autowired
-	MongoTemplate mongoTemplate;
+	PreferenceRepository preferneceRepository;
 	
-	public PreferenceService() {
-		
-	}
+	@Autowired
+	MusicRepository musicRepository;
 	
-	public PreferenceService(MongoTemplate mongo) {
-		mongoTemplate = mongo;
-	}
+	@Autowired
+	UserRepository userRepository;
 	
 	/**
 	 * Preference List
@@ -37,12 +34,7 @@ public class PreferenceService {
 	public List<Music> list() {
 		
 		// 선호도조사 여부가 true 인 것 모두 선택
-		Criteria criteria = new Criteria("preferenceTf");
-		criteria.is(true);
-		
-		Query query = new Query(criteria);
-		
-		List<Music> data = mongoTemplate.find(query, Music.class);
+		List<Music> data = musicRepository.findByPreference(true);
 		
 		return data;
 	}
@@ -62,21 +54,17 @@ public class PreferenceService {
 			
 			for( Preference l : list){
 				l.setUserId(loginId);
-				mongoTemplate.insert(l);
+				preferneceRepository.save(l);
 			}
 			
-			// 선호도조사가 완료되면 사용자 정보에 완료정보 추가
-			Criteria criteria = new Criteria("id");
-			criteria.is(loginId);
+			// 선호도조사가 완료되면 사용자 정보에 완료정보 추가			
+			User result = userRepository.updatePreference(loginId);
 			
-			Query query = new Query(criteria);
-			
-			Update update = new Update();
-			update.set("preference_tf", true);
-			
-			mongoTemplate.updateFirst(query, update, User.class);
-			
-			return true;
+			if(result != null){
+				return true;
+			}else{
+				return false;
+			}
 		}else{
 			return false;
 		}

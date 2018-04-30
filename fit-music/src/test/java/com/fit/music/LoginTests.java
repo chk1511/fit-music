@@ -7,26 +7,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.websocket.Session;
-
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,117 +28,33 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fit.entity.User;
-import com.fit.rest.JoinController;
+import com.fit.repository.UserRepository;
 import com.fit.rest.LoginController;
-import com.fit.rest.MainController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = { "com.fit.*" })
-@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
+//@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
 public class LoginTests {
 
 	@InjectMocks
-	private MainController mainController;
-	private MockMvc mainMockMvc;
-	
-	@InjectMocks
 	private LoginController loginController;
-	private MockMvc loginMockMvc;
-	
-	@InjectMocks
-	private JoinController joinController;
-	private MockMvc joinMockMvc;
+	private MockMvc mockMvc;
 	
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	UserRepository userRepository;
 
 	@Before
 	public void setup() {
-		loginController = new LoginController(mongoTemplate);
-		joinController = new JoinController(mongoTemplate);
-		
-		mainMockMvc = MockMvcBuilders.standaloneSetup(mainController).build();
-		loginMockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
-		joinMockMvc = MockMvcBuilders.standaloneSetup(joinController).build();
-		
-		mongoTemplate.findAllAndRemove(new Query(), User.class);
-		this.join_action();
-	}
-
-	@Test
-	public void index() {
-
-		try {
-			mainMockMvc.perform(get("/"))
-			.andExpect(redirectedUrl("main"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
-	public void main() {
-
-		try {
-			mainMockMvc.perform(get("/main"))
-			.andExpect(view().name("/front/main"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mockMvc = MockMvcBuilders.standaloneSetup(loginController).build();
 	}
 
 	@Test
 	public void login() {
 
 		try {
-			loginMockMvc.perform(get("/login"))
+			mockMvc.perform(get("/login"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("/front/login"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
-	public void join() {
-
-		try {
-			joinMockMvc.perform(get("/join"))
-			.andExpect(status().isOk())
-			.andExpect(view().name("/front/join"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void join_action() {
-
-		try {
-			
-			JSONObject json = new JSONObject();
-			json.put("id", "test");
-			json.put("name", "test");
-			json.put("password", "test");
-			
-			MockHttpServletRequestBuilder builder = post("/join_action")
-			.contentType(MediaType.APPLICATION_JSON_VALUE)
-			.content(json.toString());
-			
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("user", json);
-			
-			joinMockMvc.perform(builder)
-			.andExpect(status().isOk())
-			.andExpect(content().json(map.toString()));
-			
-			User user = mongoTemplate.findById("test", User.class);
-			assertNotNull(user);
-			assertThat(user.getName(), is("test"));
-			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -166,7 +75,7 @@ public class LoginTests {
 					.contentType(MediaType.APPLICATION_JSON_VALUE)
 					.content(json.toString());
 			
-			User user = mongoTemplate.findById(json.getString("inputId"), User.class);
+			User user = userRepository.findOne(json.getString("inputId"));
 			assertNotNull(user);
 			assertThat(user.getPassword(), is(json.getString("inputPass")));
 			
@@ -174,11 +83,10 @@ public class LoginTests {
 			map1.put("error", null);
 			map1.put("user", user);
 			
-			loginMockMvc.perform(builder)
+			mockMvc.perform(builder)
 			.andDo(print())
 			.andExpect(content().json(map1.toString()))
 			.andExpect(status().isOk());
-			
 			
 			// 존재하지 않는 아이디
 			JSONObject json2 = new JSONObject();
@@ -192,7 +100,7 @@ public class LoginTests {
 			Map<String, Object> map2 = new HashMap<String, Object>();
 			map2.put("error", "아이디가 존재하지 않습니다.");
 			
-			loginMockMvc.perform(builder2)
+			mockMvc.perform(builder2)
 			.andExpect(content().json(map2.toString()))
 			.andExpect(status().isOk());
 			
@@ -208,7 +116,7 @@ public class LoginTests {
 			Map<String, Object> map3 = new HashMap<String, Object>();
 			map3.put("error", "비밀번호가 일치하지 않습니다.");
 			
-			loginMockMvc.perform(builder3)
+			mockMvc.perform(builder3)
 			.andExpect(content().json(map3.toString()))
 			.andExpect(status().isOk());
 			
@@ -221,7 +129,7 @@ public class LoginTests {
 	@Test
 	public void logout(){
 		try {
-			loginMockMvc.perform(get("/logout"))
+			mockMvc.perform(get("/logout"))
 			.andExpect(status().isOk());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

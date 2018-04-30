@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,19 +24,15 @@ import com.fit.rest.PreferenceController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = { "com.fit.*" })
-@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
+//@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
 public class PreferenceTests {
 	
 	@InjectMocks
 	private PreferenceController preferenceController;
 	private MockMvc mockMvc;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
 
 	@Before
 	public void setup() {
-		preferenceController = new PreferenceController(mongoTemplate);
 		mockMvc = MockMvcBuilders.standaloneSetup(preferenceController).build();
 	}
 	

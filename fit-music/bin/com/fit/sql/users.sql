@@ -5,5 +5,8 @@ create table users (
 	 preference boolean not null
 );
 
-insert into users (name, password, preference) 
-  values( 'user1', 'user1', false);
+insert into users (id, name, password, preference) 
+  values('user1', 'user1', 'user1', false);
+
+  
+ select * from users;

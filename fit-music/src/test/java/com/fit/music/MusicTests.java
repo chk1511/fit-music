@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,24 +33,19 @@ import com.fit.rest.MusicController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = { "com.fit.*" })
-@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
+//@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
 public class MusicTests {
 	
 	@InjectMocks
 	private MusicController musicController;
 	private MockMvc mockMvc;
-	
-	@Autowired
-	private MongoTemplate mongoTemplate;
 
 	@Before
 	public void setup() {
-		
-		musicController = new MusicController(mongoTemplate);
 		mockMvc = MockMvcBuilders.standaloneSetup(musicController).build();
 	}
 	
-//	@Test
+	@Test
 	public void musicList() {
 		try {
 			mockMvc.perform(get("/music_list?page=1"))

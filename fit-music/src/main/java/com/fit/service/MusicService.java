@@ -202,20 +202,13 @@ public class MusicService {
 			
 			input.setPeriod(this.getPeriod(input.getReleaseDate()));
 			
-			Criteria criteria = new Criteria("id");
-			criteria.is(input.getId());
+			Music result = musicRepository.updateOne(input.getId(), input);
 			
-			Query query = new Query(criteria);
-			
-			DBObject dbOjc = new BasicDBObject();
-			mongoTemplate.getConverter().write(input, dbOjc);
-			Update update = new Update().fromDBObject(dbOjc);
-			
-			mongoTemplate.updateFirst(query, update, Music.class);
-			
-			musicRepository.update
-			
-			return true;
+			if(result != null){
+				return true;
+			}else{
+				return false;
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
