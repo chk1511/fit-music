@@ -1,8 +1,5 @@
 package com.fit.music;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -17,19 +14,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.fit.entity.User;
 import com.fit.rest.JoinController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ComponentScan(basePackages = { "com.fit.*" })
+@SpringBootTest
+@EnableJpaRepositories("com.fit.repository")
 public class JoinTests {
 	
 	@InjectMocks
@@ -39,12 +38,14 @@ public class JoinTests {
 	@Before
 	public void setup() {
 		mockMvc = MockMvcBuilders.standaloneSetup(joinController).build();
+		
+//		this.join_action();
 	}
 	
 	@Test
 	public void join() {
 		try {
-			mockMvc.perform(get("/id_check/test"))
+			mockMvc.perform(get("/join"))
 			.andExpect(status().isOk())
 			.andExpect(view().name("/front/join"));
 		} catch (Exception e) {
@@ -71,7 +72,6 @@ public class JoinTests {
 		}
 	}
 	
-	@Test
 	public void join_action() {
 
 		try {

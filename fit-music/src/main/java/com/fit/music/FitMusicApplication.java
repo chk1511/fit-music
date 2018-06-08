@@ -8,7 +8,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootApplication
 @ComponentScan(basePackages = { "com.fit.*" })
-@ContextConfiguration(locations="/WEB-INF/dataSource-context.xml")
 public class FitMusicApplication {
 
 	public static void main(String[] args) {
